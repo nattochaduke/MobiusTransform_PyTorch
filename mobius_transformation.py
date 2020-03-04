@@ -4,6 +4,13 @@ from scipy.ndimage import geometric_transform
 class MobiusTransform():
 
     def __init__(self, p=0.6, image_size=(224, 224), interpolation_order=3):
+        """
+
+        :param p (float): probability that the Mobius transform operation will be performed.
+        :param image_size (int, int) or int : input image size without (height, width), without channel dimension.
+                If the input were a single value v, this class interprets it as the side of square.
+        :param interpolation_order (int): the interpolation order of mobius transformation. Smaller is faster.
+        """
         self.p = p
         self.interpolation_order = interpolation_order
         if type(image_size) is int:
