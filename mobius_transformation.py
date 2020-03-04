@@ -3,16 +3,27 @@ from scipy.ndimage import geometric_transform
 
 class MobiusTransform():
 
-    def __init__(self, p=0.6, image_size=(224, 224), interpolation_order=3):
+    def __init__(self,
+                 p=0.6,
+                 image_size=(224, 224),
+                 edgemode='constant',
+                 cval=127,
+                 order=2):
         """
+        Mobius transformation (https://arxiv.org/pdf/2002.02917.pdf)
+        input array must be numpy array or PIL.Image
 
         :param p (float): probability that the Mobius transform operation will be performed.
         :param image_size (int, int) or int : input image size without (height, width), without channel dimension.
                 If the input were a single value v, this class interprets it as the side of square.
-        :param interpolation_order (int): the interpolation order of mobius transformation. Smaller is faster.
+        :param edgemode (str): 'mode' argument for scipy.ndimage.geometric_transfrom.
+        :param cval (int): 'cval' argument for scipy.ndimage.geometric_transfrom.
+        :param order (int): 'order' argument for scipy.ndimage.geometric_transfrom. Smaller is faster.
         """
         self.p = p
-        self.interpolation_order = interpolation_order
+        self.mode = edgemode
+        self.cval = cval
+        self.order = order
         if type(image_size) is int:
             height, width = image_size, image_size
         else:
@@ -117,9 +128,13 @@ class MobiusTransform():
     def __call__(self, sample):
         if np.random.uniform() > self.p:
             return sample
+        sample = np.array(sample)
         abcd = self.abcds[np.random.randint(0, 8)]
-        sample = geometric_transform(sample, self.shift_func, cval=255, output_shape=sample.shape,
-                                     order=self.interpolation_order,
+        sample = geometric_transform(sample, self.shift_func,
+                                     mode=self.mode,
+                                     cval=self.cval,
+                                     output_shape=sample.shape,
+                                     order=self.order,
                                      extra_keywords={'abcd': abcd})
         return sample
 
