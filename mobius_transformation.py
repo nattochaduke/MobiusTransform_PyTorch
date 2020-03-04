@@ -3,8 +3,9 @@ from scipy.ndimage import geometric_transform
 
 class MobiusTransform():
 
-    def __init__(self, p=0.6, image_size=(224, 224)):
+    def __init__(self, p=0.6, image_size=(224, 224), interpolation_order=3):
         self.p = p
+        self.interpolation_order = interpolation_order
         if type(image_size) is int:
             height, width = image_size, image_size
         else:
@@ -111,6 +112,7 @@ class MobiusTransform():
             return sample
         abcd = self.abcds[np.random.randint(0, 8)]
         sample = geometric_transform(sample, self.shift_func, cval=255, output_shape=sample.shape,
+                                     order=self.interpolation_order,
                                      extra_keywords={'abcd': abcd})
         return sample
 
